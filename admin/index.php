@@ -21,10 +21,6 @@ $summary = [
     ['สินค้าทั้งหมด',     number_format($count("SELECT COUNT(*) FROM products")),     'products.php'],
     ['สมาชิก',           number_format($count("SELECT COUNT(*) FROM users")),        'customers.php'],
 ];
-$salesStart = (new DateTimeImmutable('today'))->modify('-29 days');
-$salesEnd = new DateTimeImmutable('today');
-$formatThaiDate = static fn(DateTimeImmutable $date): string =>
-    $date->format('d/m/') . substr((string)($date->format('Y') + 543), -2);
 $recentOrders = $pdo->query("SELECT id, order_no, customer_name, total, status, created_at FROM orders ORDER BY id DESC LIMIT 8")->fetchAll();
 ?>
 <section class="mb-5">
@@ -59,12 +55,18 @@ $recentOrders = $pdo->query("SELECT id, order_no, customer_name, total, status, 
 </section>
 
 <section class="mb-6 rounded-3xl border border-kawaii-pink-light bg-white p-5 shadow-sm sm:p-6">
-  <div class="mb-4">
-    <h2 class="text-lg font-bold">ยอดขาย 30 วันล่าสุด</h2>
-    <p id="salesPeriod" class="text-sm text-kawaii-ink/60">ช่วง <?= h($formatThaiDate($salesStart)) ?> - <?= h($formatThaiDate($salesEnd)) ?> · อัปเดตอัตโนมัติทุก 1 นาที · นับจากวันที่ชำระเงิน (ถ้าไม่มีวันที่ชำระ ใช้วันที่สั่งซื้อ)</p>
+  <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h2 class="text-lg font-bold">กราฟยอดขายรายเดือน</h2>
+      <p id="salesPeriod" class="text-sm text-kawaii-ink/60">กำลังโหลดข้อมูล…</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <label for="monthFilter" class="text-xs font-semibold text-kawaii-ink/60">เลือกเดือน:</label>
+      <input type="month" id="monthFilter" value="<?= date('Y-m') ?>" class="rounded-2xl border border-kawaii-pink-light bg-kawaii-cream/40 px-3 py-1.5 text-sm font-semibold outline-none focus:border-kawaii-pink">
+    </div>
   </div>
   <div class="relative h-64">
-    <canvas id="salesChart" aria-label="กราฟยอดขาย 30 วันล่าสุด" role="img"></canvas>
+    <canvas id="salesChart" aria-label="กราฟยอดขาย" role="img"></canvas>
   </div>
 </section>
 
@@ -107,7 +109,9 @@ $recentOrders = $pdo->query("SELECT id, order_no, customer_name, total, status, 
 <?php
 $extraScripts = '<script>
 const salesCanvas = document.getElementById("salesChart");
+const monthFilter = document.getElementById("monthFilter");
 Chart.defaults.font.family = "Sarabun, Mali, sans-serif";
+
 const salesChart = new Chart(salesCanvas, {
   type: "bar",
   data: {
@@ -115,22 +119,39 @@ const salesChart = new Chart(salesCanvas, {
     datasets: [{
       label: "ยอดขาย (บาท)",
       data: [],
-      borderColor: "#ff6fa5",
-      backgroundColor: "rgba(255, 143, 184, 0.18)",
-      fill: true,
-      tension: 0.35
+      backgroundColor: "rgba(255, 111, 165, 0.75)",
+      hoverBackgroundColor: "#ff6fa5",
+      borderRadius: 6
     }]
   },
   options: {
     maintainAspectRatio: false,
-    plugins: { legend: { display: false } },
-    scales: { y: { beginAtZero: true, ticks: { callback: value => "฿" + value.toLocaleString() } } }
+    plugins: { 
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => " ยอดขาย: ฿" + Number(ctx.parsed.y).toLocaleString(undefined, {minimumFractionDigits: 2})
+        }
+      }
+    },
+    scales: { 
+      y: { 
+        beginAtZero: true, 
+        grid: { color: "rgba(255, 143, 184, 0.15)" },
+        ticks: { callback: value => "฿" + Number(value).toLocaleString() } 
+      },
+      x: {
+        grid: { display: false }
+      }
+    }
   }
 });
+
 async function refreshSalesChart() {
   if (document.hidden) return;
+  const selectedMonth = monthFilter.value;
   try {
-    const response = await fetch("sales-chart.php", { headers: { "Accept": "application/json" } });
+    const response = await fetch("sales-chart.php?month=" + encodeURIComponent(selectedMonth), { headers: { "Accept": "application/json" } });
     if (!response.ok) throw new Error("Sales chart request failed: " + response.status);
     const data = await response.json();
     if (!Array.isArray(data.labels) || !Array.isArray(data.values) || typeof data.period !== "string") {
@@ -138,14 +159,15 @@ async function refreshSalesChart() {
     }
     salesChart.data.labels = data.labels;
     salesChart.data.datasets[0].data = data.values;
-    salesChart.update("none");
+    salesChart.update();
     document.getElementById("salesPeriod").textContent = data.period;
   } catch (error) {
     console.error("Unable to refresh dashboard sales chart.", error);
   }
 }
+
+monthFilter.addEventListener("change", refreshSalesChart);
 refreshSalesChart();
 window.setInterval(refreshSalesChart, 60000);
 </script>';
 require __DIR__ . '/footer.php';
-
