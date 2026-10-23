@@ -97,31 +97,32 @@ function safe_back($url, $fallback) {   // อนุญาตเฉพาะ pat
 
 // ---------- การ์ดสินค้า ----------
 function product_card($p) {
+    global $lang;
     $out = $p['stock'] <= 0;
     $inactive = ($p['status'] ?? 'active') !== 'active';
     ?>
     <div class="card">
       <a href="product-detail.php?id=<?= (int)$p['id'] ?>" class="card-img">
         <img src="<?= h(img($p)) ?>" alt="<?= h($p['name']) ?>" loading="lazy" <?= $inactive ? 'style="filter:grayscale(1);opacity:.65"' : '' ?>>
-        <?php if ($p['is_new']): ?><span class="badge b-new">New Arrival</span><?php endif; ?>
-        <?php if ($p['is_best']): ?><span class="badge b-best">Best Seller</span><?php endif; ?>
-        <?php if ($inactive): ?><span class="badge" style="top:auto;left:auto;right:10px;bottom:10px;background:#777">Sold Out</span><?php endif; ?>
+        <?php if ($p['is_new']): ?><span class="badge b-new"><?= t('new_arrival_badge') ?></span><?php endif; ?>
+        <?php if ($p['is_best']): ?><span class="badge b-best"><?= t('best_seller_badge') ?></span><?php endif; ?>
+        <?php if ($inactive): ?><span class="badge" style="top:auto;left:auto;right:10px;bottom:10px;background:#777"><?= t('sold_out') ?></span><?php endif; ?>
       </a>
       <div class="card-body">
-        <h3><?= h($p['name']) ?></h3>
-        <p class="muted small"><?= h($p['name_th']) ?></p>
+        <h3><?= h(pname($p)) ?></h3>
+        <p class="muted small"><?= h($lang === 'en' ? ($p['name_th'] ?: $p['name']) : $p['name']) ?></p>
         <div class="price"><?= money($p['price']) ?></div>
         <div class="small muted">
-          ขายแล้ว <?= number_format((int)($p['sold_qty'] ?? 0)) ?> ชิ้น ·
-          <span class="<?= ($out || $inactive) ? 'red' : 'green' ?>"><?= $inactive ? 'Sold Out' : ($out ? 'สินค้าหมด' : 'คงเหลือ ' . (int)$p['stock'] . ' ชิ้น') ?></span>
+          <?= sprintf(t('sold_count'), number_format((int)($p['sold_qty'] ?? 0))) ?> ·
+          <span class="<?= ($out || $inactive) ? 'red' : 'green' ?>"><?= $inactive ? t('sold_out') : ($out ? t('out_of_stock') : sprintf(t('in_stock'), (int)$p['stock'])) ?></span>
         </div>
         <div class="row">
-          <a class="btn btn-light" href="product-detail.php?id=<?= (int)$p['id'] ?>">View Details</a>
+          <a class="btn btn-light" href="product-detail.php?id=<?= (int)$p['id'] ?>"><?= t('view_details') ?></a>
           <form method="post" action="cart.php">
             <?= csrf_field() ?>
             <input type="hidden" name="action" value="add"><input type="hidden" name="id" value="<?= (int)$p['id'] ?>">
             <input type="hidden" name="back" value="<?= h($_SERVER['REQUEST_URI']) ?>">
-            <button class="btn" <?= ($out || $inactive) ? 'disabled' : '' ?>><i class="fa-solid fa-cart-plus"></i> Add to Cart</button>
+            <button class="btn" <?= ($out || $inactive) ? 'disabled' : '' ?>><i class="fa-solid fa-cart-plus"></i> <?= t('add_to_cart') ?></button>
           </form>
         </div>
       </div>
@@ -135,3 +136,4 @@ function admin_required() {
         redirect('login.php');
     }
 }
+require_once __DIR__ . '/lang.php';

@@ -16,6 +16,6 @@ $best = $pdo->query("$base AND p.is_best=1 ORDER BY p.id DESC LIMIT 4")->fetchAl
 <a class="hero-banner" href="products.php" aria-label="Shop SuperUltraPoop products">
   <img src="assets/images/banner.jpg?v=<?= @filemtime(__DIR__ . '/assets/images/banner.jpg') ?: 1 ?>" alt="Welcome to SuperUltraPoop">
 </a>
-<h2 class="sec">New Arrivals</h2><div class="grid"><?php foreach ($new as $p) product_card($p); ?></div>
-<h2 class="sec">Best Sellers</h2><div class="grid"><?php foreach ($best as $p) product_card($p); ?></div>
+<h2 class="sec"><?= t('new_arrivals') ?></h2><div class="grid"><?php foreach ($new as $p) product_card($p); ?></div>
+<h2 class="sec"><?= t('best_sellers') ?></h2><div class="grid"><?php foreach ($best as $p) product_card($p); ?></div>
 <?php require 'includes/footer.php'; ?>
