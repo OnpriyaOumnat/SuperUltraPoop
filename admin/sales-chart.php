@@ -4,11 +4,23 @@ admin_required();
 
 header('Content-Type: application/json; charset=utf-8');
 
-// ย้อนหลัง 30 วันนับจากวันนี้ (เวลาไทย)
-$now = new DateTimeImmutable('today');
-$start = $now->modify('-29 days');
-$endExclusive = $now->modify('+1 day');
+// รับค่าเดือนที่ต้องการดู เช่น 2026-10 (ถ้าไม่ส่งมา ให้ใช้เดือนปัจจุบัน)
+$monthInput = trim($_GET['month'] ?? '');
+if (!preg_match('/^\d{4}-\d{2}$/', $monthInput)) {
+    $monthInput = date('Y-m');
+}
 
+try {
+    $firstDay = new DateTimeImmutable($monthInput . '-01');
+} catch (Exception $e) {
+    $firstDay = new DateTimeImmutable(date('Y-m-01'));
+}
+
+$daysInMonth = (int)$firstDay->format('t'); // จำนวนวันในเดือนนั้น (เช่น 28, 30, 31)
+$start = $firstDay;
+$endExclusive = $firstDay->modify('+1 month');
+
+// ดึงยอดขายของแต่ละวันในเดือนที่เลือก
 $statement = $pdo->prepare("
     SELECT DATE(CONVERT_TZ(COALESCE(p.paid_at, o.created_at), '+00:00', '+07:00')) AS day, 
            SUM(o.total) AS total
@@ -20,25 +32,34 @@ $statement = $pdo->prepare("
     GROUP BY day
     ORDER BY day
 ");
-$statement->execute([$start->format('Y-m-d 00:00:00'), $endExclusive->format('Y-m-d 23:59:59')]);
+$statement->execute([$start->format('Y-m-d 00:00:00'), $endExclusive->format('Y-m-d 00:00:00')]);
 $dailySales = $statement->fetchAll(PDO::FETCH_KEY_PAIR);
 
 $labels = [];
 $values = [];
-$days = 30;
-for ($dayOffset = 0; $dayOffset < $days; $dayOffset++) {
-    $day = $start->modify("+$dayOffset days");
-    $labels[] = $day->format('d/m');
-    $values[] = (float)($dailySales[$day->format('Y-m-d')] ?? 0);
+$monthlyTotal = 0;
+
+for ($d = 1; $d <= $daysInMonth; $d++) {
+    $currentDay = $firstDay->modify('+' . ($d - 1) . ' days');
+    $dayKey = $currentDay->format('Y-m-d');
+    $val = (float)($dailySales[$dayKey] ?? 0);
+    
+    $labels[] = $currentDay->format('d/m');
+    $values[] = $val;
+    $monthlyTotal += $val;
 }
 
-$formatThaiDate = static fn(DateTimeImmutable $date): string =>
-    $date->format('d/m/') . substr((string)($date->format('Y') + 543), -2);
-$end = $now;
-$period = 'ช่วง ' . $formatThaiDate($start) . ' - ' . $formatThaiDate($end)
-    . ' · อัปเดตอัตโนมัติทุก 1 นาที · นับจากคำสั่งซื้อที่ชำระเงินแล้ว';
+// ชื่อเดือนภาษาไทย
+$thaiMonths = [
+    '01' => 'มกราคม', '02' => 'กุมภาพันธ์', '03' => 'มีนาคม', '04' => 'เมษายน',
+    '05' => 'พฤษภาคม', '06' => 'มิถุนายน', '07' => 'กรกฎาคม', '08' => 'สิงหาคม',
+    '09' => 'กันยายน', '10' => 'ตุลาคม', '11' => 'พฤศจิกายน', '12' => 'ธันวาคม'
+];
+$mNum = $firstDay->format('m');
+$yearBE = (int)$firstDay->format('Y') + 543;
+$period = 'ประจำเดือน ' . ($thaiMonths[$mNum] ?? '') . ' ' . $yearBE . ' · ยอดรวมทั้งเดือน: ฿' . number_format($monthlyTotal, 2);
 
 echo json_encode(
-    ['labels' => $labels, 'values' => $values, 'period' => $period],
+    ['labels' => $labels, 'values' => $values, 'period' => $period, 'total' => $monthlyTotal],
     JSON_THROW_ON_ERROR | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
 );

@@ -109,7 +109,7 @@ $extraScripts = '<script>
 const salesCanvas = document.getElementById("salesChart");
 Chart.defaults.font.family = "Sarabun, Mali, sans-serif";
 const salesChart = new Chart(salesCanvas, {
-  type: "line",
+  type: "bar",
   data: {
     labels: [],
     datasets: [{
