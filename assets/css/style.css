@@ -63,3 +63,7 @@ table{width:100%;border-collapse:collapse}th,td{padding:10px;text-align:left;bor
 .variants .pill input:checked+span{background:linear-gradient(135deg,#ff8fb8,#ff6fa5);color:#fff;border-color:#ff6fa5;box-shadow:0 6px 14px rgba(255,111,165,.4)}
 .variants .pill input:checked+span::before{content:"✓ "}
 .variants .pill input:focus-visible+span{outline:3px solid var(--purple);outline-offset:2px}
+
+/* ปุ่มเปลี่ยนภาษา (Language Toggle) */
+.lang-toggle{font-size:13px!important;padding:5px 12px;border-radius:999px;background:var(--purple);color:var(--text);font-weight:700;transition:.2s;white-space:nowrap}
+.lang-toggle:hover{background:var(--pink);color:#fff;transform:scale(1.06)}
