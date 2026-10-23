@@ -21,8 +21,8 @@ $summary = [
     ['สินค้าทั้งหมด',     number_format($count("SELECT COUNT(*) FROM products")),     'products.php'],
     ['สมาชิก',           number_format($count("SELECT COUNT(*) FROM users")),        'customers.php'],
 ];
-$salesStart = new DateTimeImmutable('2026-10-15');
-$salesEnd = $salesStart->modify('+29 days');
+$salesStart = (new DateTimeImmutable('today'))->modify('-29 days');
+$salesEnd = new DateTimeImmutable('today');
 $formatThaiDate = static fn(DateTimeImmutable $date): string =>
     $date->format('d/m/') . substr((string)($date->format('Y') + 543), -2);
 $recentOrders = $pdo->query("SELECT id, order_no, customer_name, total, status, created_at FROM orders ORDER BY id DESC LIMIT 8")->fetchAll();
@@ -148,3 +148,4 @@ refreshSalesChart();
 window.setInterval(refreshSalesChart, 60000);
 </script>';
 require __DIR__ . '/footer.php';
+
