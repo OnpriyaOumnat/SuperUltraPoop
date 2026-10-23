@@ -7,12 +7,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($u && password_verify($_POST['password'] ?? '', $u['password_hash'])) {
         session_regenerate_id(true); $_SESSION['user_id'] = $u['id']; redirect($next);
     }
-    $err = 'อีเมลหรือรหัสผ่านไม่ถูกต้อง';
+    $err = t('login_error');
 }
-$pageTitle = 'Login'; require 'includes/header.php';
+$pageTitle = t('login_title'); require 'includes/header.php';
 ?>
-<div class="box form" style="max-width:420px;margin:auto"><h1>เข้าสู่ระบบ</h1>
+<div class="box form" style="max-width:420px;margin:auto"><h1><?= t('login_title') ?></h1>
 <?php if ($err): ?><div class="alert err"><?= h($err) ?></div><?php endif; ?>
-<form method="post"><?= csrf_field() ?><input type="hidden" name="next" value="<?= h($next) ?>"><label>อีเมล</label><input type="email" name="email" required><label>รหัสผ่าน</label><input type="password" name="password" required>
-<p><button class="btn">Login</button> <a href="register.php<?= $next === 'checkout.php' ? '?next=checkout.php' : '' ?>">สมัครสมาชิก</a></p></form></div>
+<form method="post"><?= csrf_field() ?><input type="hidden" name="next" value="<?= h($next) ?>"><label><?= t('email') ?></label><input type="email" name="email" required><label><?= t('password') ?></label><input type="password" name="password" required>
+<p><button class="btn"><?= t('login') ?></button> <a href="register.php<?= $next === 'checkout.php' ? '?next=checkout.php' : '' ?>"><?= t('register') ?></a></p></form></div>
 <?php require 'includes/footer.php'; ?>

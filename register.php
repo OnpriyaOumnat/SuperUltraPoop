@@ -15,11 +15,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-$pageTitle = 'Register'; require 'includes/header.php';
+$pageTitle = t('register_title'); require 'includes/header.php';
 ?>
-<div class="box form" style="max-width:420px;margin:auto"><h1>สมัครสมาชิก</h1>
+<div class="box form" style="max-width:420px;margin:auto"><h1><?= t('register_title') ?></h1>
 <?php if ($err): ?><div class="alert err"><?= h($err) ?></div><?php endif; ?>
-<form method="post"><?= csrf_field() ?><input type="hidden" name="next" value="<?= h($next) ?>"><label>ชื่อ</label><input name="name" required><label>อีเมล</label><input type="email" name="email" required>
-<label>เบอร์โทร</label><input name="phone"><label>รหัสผ่าน (8 ตัวขึ้นไป)</label><input type="password" name="password" required minlength="8">
-<p><button class="btn">Register</button></p></form></div>
+<form method="post"><?= csrf_field() ?><input type="hidden" name="next" value="<?= h($next) ?>"><label><?= t('register_name') ?></label><input name="name" required><label><?= t('email') ?></label><input type="email" name="email" required>
+<label><?= t('register_phone') ?></label><input name="phone"><label><?= t('register_pw_hint') ?></label><input type="password" name="password" required minlength="8">
+<p><button class="btn"><?= t('register') ?></button></p></form></div>
 <?php require 'includes/footer.php'; ?>
