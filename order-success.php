@@ -4,22 +4,22 @@ $st = $pdo->prepare("SELECT o.*, p.status AS payment_status FROM orders o LEFT J
 $st->execute([$_GET['no'] ?? '']); $o = $st->fetch();
 if (!$o) {
     http_response_code(404);
-    $pageTitle = 'Order not found'; require 'includes/header.php';
-    echo '<p>ไม่พบคำสั่งซื้อ</p>';
+    $pageTitle = t('order_not_found'); require 'includes/header.php';
+    echo '<p>' . t('order_not_found') . '</p>';
     require 'includes/footer.php';
     exit;
 }
 if ($o['payment_method'] === 'transfer') {
-    if ((int)$o['user_id'] !== (int)($_SESSION['user_id'] ?? 0)) { http_response_code(404); exit('ไม่พบคำสั่งซื้อ'); }
+    if ((int)$o['user_id'] !== (int)($_SESSION['user_id'] ?? 0)) { http_response_code(404); exit(t('order_not_found')); }
     if ($o['payment_status'] !== 'paid') redirect('transfer-payment.php?no=' . urlencode($o['order_no']));
 }
-$pageTitle = 'Order Success'; require 'includes/header.php';
+$pageTitle = t('order_success'); require 'includes/header.php';
 $it = $pdo->prepare("SELECT * FROM order_items WHERE order_id=?"); $it->execute([$o['id']]);
 ?>
-<div class="box"><h1>🎉 สั่งซื้อสำเร็จ</h1>
-<p>เลขที่คำสั่งซื้อ: <b><?= h($o['order_no']) ?></b> (เก็บไว้ใช้ติดตามสถานะ)</p>
+<div class="box"><h1><?= t('order_success') ?></h1>
+<p><?= t('order_no_label') ?>: <b><?= h($o['order_no']) ?></b> (<?= t('keep_order_no') ?>)</p>
 <table><?php foreach ($it->fetchAll() as $i): ?><tr><td><?= h($i['product_name']) ?><?= $i['variant'] ? ' (' . h($i['variant']) . ')' : '' ?> × <?= (int)$i['qty'] ?></td><td><?= money($i['price'] * $i['qty']) ?></td></tr><?php endforeach; ?></table>
-<p>ค่าจัดส่ง <?= money($o['shipping']) ?> | <b>รวม <?= money($o['total']) ?></b></p>
-<p>ชำระเงิน: <?= $o['payment_method'] == 'cod' ? 'เก็บเงินปลายทาง' : 'โอนเงิน (ยืนยันแล้ว)' ?></p>
-<a class="btn" href="track-order.php?no=<?= h($o['order_no']) ?>">ติดตามคำสั่งซื้อ</a></div>
+<p><?= t('shipping_fee') ?> <?= money($o['shipping']) ?> | <b><?= t('total') ?> <?= money($o['total']) ?></b></p>
+<p><?= t('payment_label') ?>: <?= $o['payment_method'] == 'cod' ? t('payment_cod') : t('payment_transfer') ?></p>
+<a class="btn" href="track-order.php?no=<?= h($o['order_no']) ?>"><?= t('track_order') ?></a></div>
 <?php require 'includes/footer.php'; ?>
