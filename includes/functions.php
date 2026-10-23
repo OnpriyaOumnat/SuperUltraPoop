@@ -1,6 +1,7 @@
 <?php
 // ฟังก์ชันกลางของระบบ (ใช้ร่วมกันทั้งหน้าบ้านและหลังบ้าน)
 // ตั้งค่า cookie ของ session ให้ปลอดภัยขึ้น (ต้องเรียกก่อน session_start)
+date_default_timezone_set('Asia/Bangkok');
 $isHttps = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
 session_set_cookie_params([
     'lifetime' => 0,
@@ -11,6 +12,7 @@ session_set_cookie_params([
 ]);
 session_start();
 require_once __DIR__ . '/../config/database.php';
+$pdo->exec("SET time_zone = '+07:00'");
 
 class OrderWorkflowException extends RuntimeException {}
 
