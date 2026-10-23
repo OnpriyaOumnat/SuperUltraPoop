@@ -53,17 +53,49 @@ table{width:100%;border-collapse:collapse}th,td{padding:10px;text-align:left;bor
 .footer{margin-top:40px;background:#fff;padding:26px;display:flex;gap:30px;justify-content:space-around;flex-wrap:wrap;border-top:4px solid var(--pink2)}
 .status{padding:3px 12px;border-radius:12px;background:var(--purple);font-size:13px}
 @media(max-width:700px){
-  .two{grid-template-columns:1fr}
-  .nav{padding:10px}
-  .tab{padding:10px 18px;font-size:15px}
-  .grid{grid-template-columns:repeat(2, 1fr);gap:12px}
-  .card{border-radius:16px}
-  .card-body{padding:10px}
-  .card-body h3{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .price{font-size:16px}
-  .badge{font-size:10px;padding:2px 7px}
-  .b-best{top:30px}
-  .btn{padding:7px 12px;font-size:12px}
+  /* จัดการระยะขอบหน้าจอให้กระชับ */
+  .wrap{padding:0 12px;margin:12px auto}
+  
+  /* จัด Navbar และโลโก้ให้กะทัดรัด */
+  .nav{padding:10px 14px;gap:8px}
+  .logo{font-size:18px}
+  .nav nav{gap:4px;overflow-x:auto;white-space:nowrap;width:100%;padding-bottom:4px}
+  .nav nav::-webkit-scrollbar{display:none}
+  .nav nav a{padding:5px 10px;font-size:13px}
+  
+  /* ปรับแถบค้นหาและไอคอนให้พอดีบรรทัด */
+  .search{flex:1;min-width:140px}
+  .search input{padding:6px 10px;font-size:13px}
+  .search button{padding:0 12px}
+  .icons{gap:10px;font-size:17px;align-items:center}
+  .lang-toggle{font-size:11px!important;padding:4px 8px}
+
+  /* ปรับ Banner บนมือถือ */
+  .hero-banner{border-radius:18px}
+  h2.sec{margin:20px 0 10px;font-size:20px}
+
+  /* สินค้าแสดงแบบ 2 คอลัมน์สมส่วน */
+  .grid{grid-template-columns:repeat(2, 1fr);gap:10px}
+  .card{border-radius:16px;display:flex;flex-direction:column}
+  .card-img{aspect-ratio:1}
+  .card-body{padding:10px;display:flex;flex-direction:column;flex:1}
+  .card-body h3{font-size:13px;line-height:1.3;margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .card-body .muted.small{font-size:11px;margin:0 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .price{font-size:15px;margin:2px 0}
+  .badge{font-size:9px;padding:2px 6px;border-radius:8px;top:6px;left:6px}
+  .b-best{top:26px}
+  
+  /* จัดแถวปุ่มใต้สินค้าให้สวยงาม ไม่เบียด */
+  .card-body .row{margin-top:auto;gap:6px;display:flex;flex-direction:column;width:100%}
+  .card-body .btn{width:100%;text-align:center;padding:6px 8px;font-size:11px;border-radius:12px}
+  .card-body form{width:100%}
+
+  /* หน้ารายละเอียดสินค้าและฟอร์ม */
+  .two{grid-template-columns:1fr;gap:16px}
+  .box{padding:14px;border-radius:16px}
+  .tab{padding:8px 14px;font-size:14px;border-radius:20px}
+  .filters{gap:8px}
+  .filters input, .filters select{font-size:13px;padding:7px 10px}
 }
 
 /* ปุ่มเลือกสี/ตัวเลือก (Kawaii pink pill) */
