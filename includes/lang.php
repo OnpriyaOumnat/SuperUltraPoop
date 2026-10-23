@@ -68,7 +68,7 @@ $T = [
     'items_total'     => 'จำนวนรวม %d ชิ้น',
     'subtotal'        => 'ยอดรวม',
     'continue_shopping' => 'เลือกสินค้าต่อ',
-    'checkout'        => 'Checkout',
+    'checkout'        => 'ชำระเงิน',
 
     // ----- Checkout -----
     'checkout_title'  => 'สั่งซื้อสินค้า',
