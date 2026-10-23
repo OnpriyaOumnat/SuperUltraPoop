@@ -35,9 +35,9 @@ if ($q !== '') { $sql .= " AND (p.name LIKE ? OR p.name_th LIKE ?)"; $args[] = "
 $st = $pdo->prepare("$sql ORDER BY $orderBy"); $st->execute($args);
 $items = $st->fetchAll();
 ?>
-<h2 class="sec">เลือกหมวดหมู่สินค้า</h2>
-<div class="tabs" aria-label="เลือกหมวดหมู่สินค้า">
-  <a class="tab <?= $cat === 0 ? 'active' : '' ?>" href="<?= h($categoryUrl(0)) ?>" <?= $cat === 0 ? 'aria-current="page"' : '' ?>>สินค้าทั้งหมด</a>
+<h2 class="sec"><?= t('select_category') ?></h2>
+<div class="tabs" aria-label="<?= t('select_category') ?>">
+  <a class="tab <?= $cat === 0 ? 'active' : '' ?>" href="<?= h($categoryUrl(0)) ?>" <?= $cat === 0 ? 'aria-current="page"' : '' ?>><?= t('all_products') ?></a>
   <?php foreach ($categories as $category): ?>
     <a class="tab <?= $cat === (int)$category['id'] ? 'active' : '' ?>"
        href="<?= h($categoryUrl((int)$category['id'])) ?>"
@@ -46,16 +46,16 @@ $items = $st->fetchAll();
 </div>
 <form class="filters" method="get">
   <?php if ($cat > 0): ?><input type="hidden" name="cat" value="<?= $cat ?>"><?php endif; ?>
-  <input name="q" value="<?= h($q) ?>" placeholder="ค้นหาสินค้า...">
+  <input name="q" value="<?= h($q) ?>" placeholder="<?= t('search_placeholder') ?>">
   <select name="sort" onchange="this.form.submit()">
-    <option value="best_selling" <?= $sort=='best_selling'?'selected':'' ?>>สินค้าขายดี</option>
-    <option value="new" <?= $sort=='new'?'selected':'' ?>>สินค้ามาใหม่</option>
-    <option value="price_asc" <?= $sort=='price_asc'?'selected':'' ?>>ราคา: ต่ำ → สูง</option>
-    <option value="price_desc" <?= $sort=='price_desc'?'selected':'' ?>>ราคา: สูง → ต่ำ</option>
+    <option value="best_selling" <?= $sort=='best_selling'?'selected':'' ?>><?= t('sort_best') ?></option>
+    <option value="new" <?= $sort=='new'?'selected':'' ?>><?= t('sort_new') ?></option>
+    <option value="price_asc" <?= $sort=='price_asc'?'selected':'' ?>><?= t('sort_price_asc') ?></option>
+    <option value="price_desc" <?= $sort=='price_desc'?'selected':'' ?>><?= t('sort_price_desc') ?></option>
   </select>
-  <button class="btn">ค้นหา</button>
+  <button class="btn"><?= t('search_btn') ?></button>
 </form>
-<p class="muted">แสดง <?= count($items) ?> รายการ</p>
+<p class="muted"><?= sprintf(t('showing_items'), count($items)) ?></p>
 <div class="grid"><?php foreach ($items as $p) product_card($p); ?></div>
-<?php if (!$items): ?><p>ไม่พบสินค้า 🥲</p><?php endif; ?>
+<?php if (!$items): ?><p><?= t('no_products') ?></p><?php endif; ?>
 <?php require 'includes/footer.php'; ?>
